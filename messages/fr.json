@@ -1,0 +1,50 @@
+{
+  "common": {
+    "mainNav": "Navigation principale",
+    "language": "Langue",
+    "comingSoonKicker": "Bientôt disponible",
+    "comingSoonTitle": "Cette page arrive bientôt",
+    "comingSoonBody": "Nous construisons encore cette section. Revenez nous voir très vite.",
+    "backHome": "Retour à l'accueil",
+    "menu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "viewAll": "Tout voir",
+    "upcoming": "À venir",
+    "past": "Passé",
+    "download": "Télécharger le PDF",
+    "backProgrammes": "Tous les programmes",
+    "backStories": "Toutes les histoires",
+    "backNews": "Toutes les actualités",
+    "raised": "Collecté",
+    "goal": "Objectif",
+    "fundThis": "Financer ce programme",
+    "readOn": "Lire la suite",
+    "team": "Équipe",
+    "noProgrammes": "Aucun programme n'est publié pour le moment.",
+    "noStories": "Aucune histoire n'est publiée pour le moment.",
+    "noNews": "Pas encore d'actualités."
+  },
+  "programme": {
+    "funded": "{percent} % financé"
+  },
+  "donate": {
+    "amount": "Choisissez un montant (XAF)",
+    "custom": "Autre montant",
+    "frequency": "Fréquence",
+    "once": "Une fois",
+    "monthly": "Chaque mois",
+    "programme": "Où doit aller votre don ?",
+    "general": "Là où le besoin est le plus grand",
+    "name": "Votre nom",
+    "email": "E-mail (pour votre reçu)",
+    "submit": "Donner par Mobile Money",
+    "soon": "Les paiements Mobile Money en ligne sont en cours de connexion. Pour l'instant, ce formulaire montre comment le don fonctionnera, et rien de ce que vous saisissez n'est envoyé.",
+    "impactTitle": "Ce que fait votre don",
+    "tier5": "relie une famille à une source d'eau sûre et locale.",
+    "tier10": "finance une année de fournitures scolaires pour un élève.",
+    "tier25": "forme un membre de comité villageois à entretenir un point d'eau.",
+    "tier50": "démarre une coopérative de femmes.",
+    "phone": "Vous validez le paiement sur votre propre téléphone avec MTN ou Orange Mobile Money.",
+    "formTitle": "Donner par Mobile Money"
+  }
+}

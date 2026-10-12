@@ -1,0 +1,50 @@
+{
+  "common": {
+    "mainNav": "Main",
+    "language": "Language",
+    "comingSoonKicker": "Coming soon",
+    "comingSoonTitle": "This page is on its way",
+    "comingSoonBody": "We are still building this section. Please check back soon.",
+    "backHome": "Back to the homepage",
+    "menu": "Open menu",
+    "closeMenu": "Close menu",
+    "viewAll": "View all",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "download": "Download PDF",
+    "backProgrammes": "All programmes",
+    "backStories": "All stories",
+    "backNews": "All news",
+    "raised": "Raised",
+    "goal": "Goal",
+    "fundThis": "Fund this programme",
+    "readOn": "Read on",
+    "team": "Team",
+    "noProgrammes": "No programmes are published yet.",
+    "noStories": "No stories are published yet.",
+    "noNews": "No news yet."
+  },
+  "programme": {
+    "funded": "{percent}% funded"
+  },
+  "donate": {
+    "amount": "Choose an amount (XAF)",
+    "custom": "Other amount",
+    "frequency": "How often",
+    "once": "One time",
+    "monthly": "Monthly",
+    "programme": "Where should it go?",
+    "general": "Where it is needed most",
+    "name": "Your name",
+    "email": "Email (for your receipt)",
+    "submit": "Donate via Mobile Money",
+    "soon": "Online mobile money payments are being connected. For now this form shows how giving will work, and nothing you type is sent anywhere.",
+    "impactTitle": "What your gift does",
+    "tier5": "connects one family to a safe, local water source.",
+    "tier10": "pays for a year of school supplies for one pupil.",
+    "tier25": "trains a village water committee member to keep a tap running.",
+    "tier50": "seeds a women's cooperative.",
+    "phone": "You approve the payment on your own phone with MTN or Orange Mobile Money.",
+    "formTitle": "Give by mobile money"
+  }
+}

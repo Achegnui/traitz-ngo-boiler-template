@@ -1,0 +1,58 @@
+rules_version = '2';
+// Phase 3 rules: roles are enforced HERE, not in the admin screens.
+//   administrator  everything, including who is staff
+//   editor         create / edit / publish / delete content, site settings, read messages and donations
+//   contributor    create and edit DRAFTS only; cannot touch anything published, cannot delete
+// Visitors (not signed in) can read published content only.
+//
+// Publish: Firebase console > Firestore > Rules (paste, Publish), or
+//   npx firebase-tools deploy --only firestore:rules --project <your-project-id>
+// NOT exercised against the emulator. Run the Rules playground checks listed in the README first.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function staffDoc() { return get(/databases/$(database)/documents/admins/$(request.auth.uid)).data; }
+    function isStaff() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function isAdministrator() { return isStaff() && staffDoc().role == 'administrator'; }
+    function isEditor() { return isStaff() && staffDoc().role in ['administrator', 'editor']; }
+    function isContributor() { return isStaff() && staffDoc().role == 'contributor'; }
+    function isContent(c) { return c in ['pages', 'programmes', 'stories', 'news', 'events', 'reports', 'team', 'partners']; }
+    function validStatus() { return request.resource.data.status in ['draft', 'published']; }
+
+    // Site chrome (nav, footer, SEO): public read, editors change it.
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isEditor();
+    }
+
+    // Content: visitors see published documents only (their queries must filter status == "published").
+    match /{collection}/{id} {
+      allow read: if isContent(collection) && (isStaff() || resource.data.status == 'published');
+      allow create: if isContent(collection) && validStatus()
+                    && (isEditor() || (isContributor() && request.resource.data.status == 'draft'));
+      allow update: if isContent(collection) && validStatus()
+                    && (isEditor() || (isContributor() && resource.data.status == 'draft' && request.resource.data.status == 'draft'));
+      allow delete: if isContent(collection) && isEditor();
+    }
+
+    // Form submissions (Phase 5): anyone may create one, only editors may read or change them.
+    match /submissions/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['type', 'name', 'email', 'phone', 'message', 'createdAt', 'handled'])
+                    && request.resource.data.handled == false;
+      allow read, update, delete: if isEditor();
+    }
+
+    // Donations (Phase 4): written only by the server (the Admin SDK / server routes bypass rules).
+    match /donations/{id} {
+      allow read: if isEditor();
+      allow write: if false;
+    }
+
+    // Staff list: you can read your own record; administrators manage everyone's.
+    match /admins/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdministrator());
+      allow create, update, delete: if isAdministrator();
+    }
+  }
+}

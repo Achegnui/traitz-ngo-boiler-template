@@ -1,0 +1,102 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./shadcn-map.css";
+
+/* Tokens. Brand colours live in theme/brand.config.ts: themeVars() writes --brand-anchor, --brand-accent, --brand-tint,
+   --brand-ink and --brand-muted on <html>. @theme maps them to utilities (bg-brand-accent, text-brand-ink, ...), and the
+   shadcn semantic variables below map onto the same tokens, so a rebrand changes one file. Light only: no dark mode. */
+@theme inline {
+  --color-brand-anchor: var(--brand-anchor);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-tint: var(--brand-tint);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-muted: var(--brand-muted);
+
+
+  --font-display: var(--font-display-active), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-mono-brand), ui-monospace, monospace;
+
+  --animate-slidein: slidein 0.22s cubic-bezier(0.2, 0.7, 0.2, 1);
+  @keyframes slidein {
+    from { transform: translateX(40px); opacity: 0; }
+    to { transform: none; opacity: 1; }
+  }
+  --animate-zoom: zoom 14s ease-out forwards;
+  @keyframes zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+  }
+  --animate-up: up 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  @keyframes up {
+    to { opacity: 1; transform: none; }
+  }
+  --animate-up-t: up-t 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  @keyframes up-t {
+    to { transform: none; }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --radius: 0.625rem;
+    --line: color-mix(in srgb, var(--brand-ink) 15%, transparent);
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --background: white;
+    --foreground: var(--brand-ink);
+    --card: white;
+    --card-foreground: var(--brand-ink);
+    --popover: white;
+    --popover-foreground: var(--brand-ink);
+    --primary: var(--brand-accent);
+    --primary-foreground: var(--brand-anchor);
+    --secondary: var(--brand-tint);
+    --secondary-foreground: var(--brand-ink);
+    --muted: var(--brand-tint);
+    --muted-foreground: var(--brand-muted);
+    --accent: var(--brand-tint);
+    --accent-foreground: var(--brand-ink);
+    --destructive: var(--color-red-600);
+    --border: var(--line);
+    --input: var(--line);
+    --ring: var(--brand-accent);
+  }
+  html { scroll-behavior: smooth; scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { @apply bg-white font-sans text-[17px] leading-[1.6] text-brand-ink antialiased; }
+  h1, h2, h3 { @apply font-display font-bold leading-[1.05] tracking-[-0.02em]; }
+  :focus-visible { outline: 3px solid var(--brand-accent); outline-offset: 3px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+}
+
+/* Decorative backgrounds. They need pseudo-elements, so they stay as utilities. Put them on a `relative overflow-hidden`
+   container and lift the real content above with `relative z-2`. */
+/* grain: fine paper noise over a dark band */
+@utility grain {
+  &::after { content: ""; position: absolute; inset: 0; background: var(--grain); pointer-events: none; z-index: 1; }
+}
+/* contour-light: survey contour lines, light strokes, for dark bands */
+@utility contour-light {
+  &::before { content: ""; position: absolute; inset: 0; background: url(/art/c-light.svg) center / cover; pointer-events: none; }
+}
+/* contour-dark: survey contour lines, dark strokes, for light or amber bands */
+@utility contour-dark {
+  &::before { content: ""; position: absolute; inset: 0; background: url(/art/c-dark.svg) center / cover; pointer-events: none; }
+}
+/* hero-sky: warm sunrise gradient behind (or instead of) the hero photo, with a left-to-right dark wash so text stays legible.
+   Built from the brand accent and anchor, so a rebrand recolours it. Fill the element with an <Image fill> to show a photo. */
+@utility hero-sky {
+  background:
+    radial-gradient(70% 60% at 70% 30%, color-mix(in srgb, var(--brand-accent) 60%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-accent) 19%, var(--brand-anchor)) 0%, color-mix(in srgb, var(--brand-accent) 52%, var(--brand-anchor)) 38%, color-mix(in srgb, var(--brand-accent) 11%, var(--brand-anchor)) 70%, var(--brand-anchor) 100%);
+  &::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--brand-anchor) 75%, transparent), color-mix(in srgb, var(--brand-anchor) 15%, transparent)); }
+}
+/* contour-mask-light and contour-mask-dark: the same contour lines as contour-light and contour-dark, drawn as a mask on a
+   pseudo-element. Used where the lines sit in the first screen: a mask is not an image the browser counts as the page's
+   largest paint (LCP), and contrast checkers ignore pseudo-elements, so they do not mistake the lines for a solid backdrop. */
+@utility contour-mask-light {
+  &::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: white; mask: url(/art/c-light.svg) center / cover no-repeat; }
+}
+@utility contour-mask-dark {
+  &::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: var(--brand-ink); mask: url(/art/c-dark.svg) center / cover no-repeat; }
+}

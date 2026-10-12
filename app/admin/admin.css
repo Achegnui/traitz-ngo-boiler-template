@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../shadcn-map.css";
+
+/* Admin look. The admin keeps its own slate and amber palette (Tailwind's named colours), separate from the public brand
+   tokens, and the shadcn semantic variables map onto it. --radius 0.5rem reproduces Tailwind's default radii. Light only. */
+@theme inline {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --animate-pop: pop 0.16s ease-out;
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --radius: 0.5rem;
+    --background: white;
+    --foreground: var(--color-slate-900);
+    --card: white;
+    --card-foreground: var(--color-slate-900);
+    --popover: white;
+    --popover-foreground: var(--color-slate-900);
+    --primary: var(--color-amber-400);
+    --primary-foreground: var(--color-slate-900);
+    --secondary: var(--color-slate-100);
+    --secondary-foreground: var(--color-slate-900);
+    --muted: var(--color-slate-100);
+    --muted-foreground: var(--color-slate-500);
+    --accent: var(--color-slate-100);
+    --accent-foreground: var(--color-slate-900);
+    --destructive: var(--color-red-700);
+    --border: var(--color-slate-200);
+    --input: var(--color-slate-300);
+    --ring: var(--color-amber-300);
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-gray-100 text-slate-900; }
+  :focus-visible { outline: 2px solid var(--color-amber-500); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+}
