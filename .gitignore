@@ -4,3 +4,7 @@ next-env.d.ts
 .env*
 !.env.example
 .shots
+
+*firebase-adminsdk*.json
+*service-account*.json
+*.pem
