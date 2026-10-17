@@ -3,7 +3,7 @@ import { routing } from "@/i18n/routing";
 import { getAllProgrammes, getNews, getStories, listPages } from "@/lib/data";
 import { languageAlternates, pathFor, siteUrl } from "@/lib/seo";
 
-export const revalidate = 300;
+export const revalidate = 60;
 
 /** Only real pages (home, pages built in the admin, news posts). Coming-soon placeholders are noindex and left out. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

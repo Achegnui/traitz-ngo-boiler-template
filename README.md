@@ -1,4 +1,4 @@
-# Traitz NGO Boilerplate (Phases 1-3: frontend, Firestore, admin)
+# Traitz NGO Boilerplate (Phases 1-4: frontend, Firestore, admin, donations)
 
     npm install
     npm run dev      # http://localhost:3000 redirects to /en
@@ -13,11 +13,11 @@ Setup: copy `.env.example` to `.env.local` and fill in the six `NEXT_PUBLIC_FIRE
     npm run seed            # writes them (refuses if pages/home exists; --force overwrites)
     npm run check:firebase  # reads them back the way the site does
     npm run dev             # edits in the console show on refresh
-    npm run build && npm start   # production: edits go live within 30 s (see below)
+    npm run build && npm start   # production: edits go live within 60 s (see below)
 
 Collections: `pages/{slug}` (block array, spec 4.1), `settings/site` (nav, footer, route SEO), `programmes`, `stories`, `news`, `team`, `partners`. Dates are ISO strings. The seed data lives in `scripts/seed-data/` and is the only place demo copy exists.
 
-Reads go through `lib/data.ts` -> `lib/source.ts` -> `lib/firebase.ts` (the only Firebase init). Routes set `export const revalidate = 30`: after you edit a document, the first visit after 30 s serves the old page and triggers a rebuild of it, the next visit shows the change. `DATA_SOURCE=local` serves the bundled seed data without Firestore (offline dev, CI).
+Reads go through `lib/data.ts` -> `lib/source.ts` -> `lib/firebase.ts` (the only Firebase init). Routes set `export const revalidate = 60`: after you edit a document, the first visit after 60 s serves the old page and triggers a rebuild of it, the next visit shows the change. `DATA_SOURCE=local` serves the bundled seed data without Firestore (offline dev, CI). If Firestore is unreachable during `npm run build`, each read times out after 8 s and falls back to the bundled seed data (dynamic routes then render on first request); at runtime a failed read throws, so Next keeps the last good page.
 
 Security: seeding uses the web SDK, so run it while your rules still allow writes (test mode). Then deploy `firestore.rules` (`npx firebase-tools deploy --only firestore:rules --project <id>`). Test-mode rules expire after 30 days, so do this before then. Storage rules (`storage.rules`) are for Phase 3 uploads.
 
@@ -44,13 +44,25 @@ Open `/admin`. Staff sign in with email and password (Firebase Auth). A person i
 - **Screens:** Dashboard, Pages (block-level builder: add, remove, reorder, edit, draft or publish; new pages appear at `/{locale}/{slug}`), Programmes, Stories, News, Events, Reports, Team, Partners, Submissions, Donations (read-only), Users, Help. Every bilingual field edits English and French together; French falls back to English when empty.
 - **Validation:** `lib/schemas.ts` is used by the forms (publishing needs a complete document; drafts need only a title) and by the public site (a malformed document or block is skipped and logged, never a crash).
 - **Uploads:** images and PDFs go to Cloudinary. Add `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET` to `.env.local`. The browser asks `/api/cloudinary/sign` for a one-time signature; the server only grants it to signed-in staff and fixes the folder and file types.
-- **Instant updates:** after a save the admin calls `/api/revalidate` so the site updates at once (otherwise within 30 s).
+- **Instant updates:** after a save the admin calls `/api/revalidate` so the site updates at once (otherwise within 60 s).
 - **Try it without Firebase:** `NEXT_PUBLIC_ADMIN_BACKEND=fake DATA_SOURCE=local npm run dev` runs the admin against an in-memory copy of the seed data. Accounts `admin@example.test`, `editor@example.test`, `contributor@example.test`, `stranger@example.test` (not staff), password `demo-pass-1`. Production builds do not include it.
 - **Publish the rules, then run these checks** in Firebase console > Firestore > Rules > Rules playground (they have not been run against an emulator):
   1. Not signed in, `get /pages/home`: allowed. A draft document: denied. `update /news/x`: denied. `get /settings/site`: allowed. `get /donations/x` and `get /submissions/x`: denied.
   2. Signed in as your administrator UID: `get /admins/<your UID>` allowed; as any other UID: denied. `update` any content document: allowed.
   3. Signed in as a contributor UID: `create /news/test` with `status: "published"` denied, with `status: "draft"` allowed; `update` a published document denied; `delete` denied.
 - Editing the site menu, footer and meta description is still done in the Firebase console (`settings/site`).
+
+## Donations (Phase 4)
+
+Donors pay by Mobile Money through Fapshi, in sandbox or live mode.
+
+- **Flow:** the form at `/{locale}/donate` posts to `POST /api/donate/initiate`, which saves a `pending` donation in Firestore and returns a Fapshi payment link. Fapshi sends the donor back to `/{locale}/donate/thank-you?d=<donation id>`, which polls `GET /api/donate/status` until the payment is completed or failed. `POST /api/donate/webhook` is for Fapshi's own notification: it never trusts the request body and fetches the real status from Fapshi.
+- **Where:** `lib/server/` (`fapshi.ts`, `donations.ts`, `donation-store.ts`, `firebase-admin.ts`, `http.ts`, `rate-limit.ts`), `app/api/donate/*`, `lib/donate-client.ts`, `components/donate/*`, and the admin screen `app/admin/(panel)/donations`.
+- **Setup:** the variables in `.env.example` (service account e-mail and key, `FAPSHI_ENV`, `FAPSHI_API_USER`, `FAPSHI_API_KEY`). A sandbox key starts with `FAK_TEST_` and needs `FAPSHI_ENV=sandbox`; the app refuses a mismatch so a test key can never reach live mode.
+- **Rules:** donations are written only by the server (Admin SDK). Editors and administrators can read them; nobody can write them from a browser.
+- **Admin screen:** totals of completed, pending and failed donations, a status filter, the programme, the reason a payment failed, and a warning when Fapshi reported a different amount than the donor pledged.
+- **Tests:** `npm test` runs 127 tests (Fapshi client, donation logic, the three routes, form logic, English and French strings, admin helpers, data helpers, a static check of the rules). They use mocks. To try the real thing with your own keys, follow `DONATIONS-TEST.md`.
+- **Limits:** 100 to 1,000,000 XAF per gift. Monthly giving records the donor's intention only: every gift is a separate payment and nothing is charged automatically.
 
 ## Adding the new pages to an existing Firestore
 
@@ -74,7 +86,9 @@ Open `/admin`. Staff sign in with email and password (Firebase Auth). A person i
 Admin: no live preview before publishing; no drag-and-drop (Up/Down buttons instead); sign-up is open at the Firebase level (a stranger can create a login but gets no access without an `admins` record); `storage.rules` is unused while uploads go to Cloudinary.
 
 
-Illustrated stand-ins instead of real photos (add photos via the admin or /public/photos), no shadcn/ui, styling is global CSS in `app/globals.css` rather than Tailwind utilities, donate form is interface only until Phase 4, no contact or volunteer forms until Phase 5, LCP not re-measured after the redesign (last measured 2.76 s on Slow 4G against a 2.5 s target).
+Donations: not yet tried with a real Fapshi sandbox payment or a real Firestore write; the webhook's payload shape and whether personal sandbox keys can create payment links are unconfirmed; monthly giving is not recurring; the rules were checked as text only, not run in the emulator or playground.
+
+Illustrated stand-ins instead of real photos (add photos via the admin or /public/photos), no shadcn/ui, styling is global CSS in `app/globals.css` rather than Tailwind utilities, no contact or volunteer forms until Phase 5, LCP not re-measured after the redesign (last measured 2.76 s on Slow 4G against a 2.5 s target).
 
 v2 backlog: donor portals, e-commerce, native apps, migration tooling, grant/M&E dashboards, card payments, multi-tenancy.
 

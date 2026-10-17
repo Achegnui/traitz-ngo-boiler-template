@@ -1,6 +1,7 @@
 import type { ZodType } from "zod";
 import { blockSchema, eventSchema, newsSchema, pageShell, partnerSchema, programmeSchema, reportSchema, siteSchema, storySchema, teamSchema } from "@/lib/schemas";
 import { readDoc, readPublished, type WithId } from "@/lib/source";
+export { servedFallback } from "@/lib/source";
 import type { Block, EventItem, NewsItem, PageDoc, Partner, Programme, Report, SiteContent, Story, TeamMember } from "@/lib/types";
 
 /**

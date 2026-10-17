@@ -43,7 +43,11 @@ service cloud.firestore {
       allow read, update, delete: if isEditor();
     }
 
-    // Donations (Phase 4): written only by the server (the Admin SDK / server routes bypass rules).
+    // Donations (Phase 4): written ONLY by the server. The donate routes use the Admin SDK (a service account), which
+    // bypasses these rules, so nothing in a browser can create, change or delete a donation, not even an administrator.
+    // Editors and administrators may read them (they hold donor names and e-mail addresses); contributors and visitors may not.
+    // Fields: amount, currency, donorName, donorEmail, frequency, programmeId, locale, fapshiTransactionId,
+    // status (pending | completed | failed), failureReason, createdAt, updatedAt.
     match /donations/{id} {
       allow read: if isEditor();
       allow write: if false;

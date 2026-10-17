@@ -12,7 +12,7 @@ import { Container, Section } from "@/components/ui/Section";
 import { leadClass } from "@/components/ui/typography";
 
 /** Console edits go live within this many seconds (ISR). In `next dev` pages are always fresh. */
-export const revalidate = 30;
+export const revalidate = 60;
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

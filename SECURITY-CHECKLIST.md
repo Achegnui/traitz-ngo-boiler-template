@@ -82,6 +82,12 @@ Then confirm no browser code writes donations. In the project folder run:
 
 Expected: no line that calls `setDoc`, `addDoc`, `updateDoc` or `deleteDoc` on `donations`. (The admin screens only read.)
 
+Then confirm the server secrets never reach the browser. Neither name may start with `NEXT_PUBLIC_`, and this should print nothing:
+
+    grep -rn "FIREBASE_ADMIN\|FAPSHI_" app components lib --include=*.ts --include=*.tsx | grep -v "^lib/server"
+
+And confirm the service account file is not in git: `git ls-files | grep -iE "adminsdk|service-account"` should print nothing. If it prints a file, remove it from git and generate a new key in the Firebase console, because the old one is exposed.
+
 ## 5. `.env.local` is not in git
 
 In the project folder:

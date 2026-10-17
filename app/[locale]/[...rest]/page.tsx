@@ -14,7 +14,7 @@ import { btnRow, headingXl, leadClass, monoLabel } from "@/components/ui/typogra
 import { cn } from "@/lib/utils";
 
 /** Console edits go live within this many seconds (ISR). In `next dev` pages are always fresh. */
-export const revalidate = 30;
+export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string; rest: string[] }> };
 

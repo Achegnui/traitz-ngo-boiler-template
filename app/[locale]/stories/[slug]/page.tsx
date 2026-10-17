@@ -7,7 +7,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { AppLink } from "@/components/ui/AppLink";
 import { Media } from "@/components/ui/Media";
 import { routing } from "@/i18n/routing";
-import { getStories, getStoryBySlug } from "@/lib/data";
+import { getStories, getStoryBySlug, servedFallback } from "@/lib/data";
 import { formatDate, localize } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
 import { PageBanner } from "@/components/blocks/PageHeader";
@@ -16,11 +16,13 @@ import { figCaption, figClass, figMedia, proseP, proseWrap } from "@/components/
 import { cn } from "@/lib/utils";
 
 /** Console edits go live within this many seconds (ISR). In `next dev` pages are always fresh. */
-export const revalidate = 30;
+export const revalidate = 60;
+export const dynamicParams = true;
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
   const all = await getStories();
+  if (servedFallback()) return [];
   return routing.locales.flatMap((locale) => all.map((s) => ({ locale, slug: s.slug })));
 }
 

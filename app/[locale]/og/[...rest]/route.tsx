@@ -4,7 +4,7 @@ import { getPage, getSite } from "@/lib/data";
 import { localize } from "@/lib/i18n";
 import { ogImage } from "@/lib/og";
 
-export const revalidate = 30;
+export const revalidate = 60;
 
 /**
  * Preview image for placeholder pages. Next cannot serve a file-based opengraph-image beneath a

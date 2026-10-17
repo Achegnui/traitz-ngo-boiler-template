@@ -34,6 +34,16 @@ function load(): Db {
   db.submissions["s1"] = { type: "volunteer", name: "Ngong Ruth", email: "ruth@example.test", phone: "+237 6 00 00 00 01", message: "I would like to volunteer on weekends.", createdAt: "2026-09-30T10:12:00Z", handled: false };
   db.submissions["s2"] = { type: "contact", name: "Tchinda Paul", email: "paul@example.test", phone: "", message: "Do you accept donations by cheque?", createdAt: "2026-09-28T08:00:00Z", handled: true };
   db.donations["d1"] = { amount: 5000, currency: "XAF", donorName: "Anonymous", donorEmail: "", frequency: "one-time", status: "completed", createdAt: "2026-09-29T12:00:00Z" };
+  // A mix of states so the admin table can be exercised offline. Times are relative so "probably abandoned" stays meaningful.
+  const ago = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
+  const don = (amount: number, donorName: string, donorEmail: string, frequency: string, programmeId: string | null, status: string, createdAt: string, failureReason?: string) =>
+    ({ amount, currency: "XAF", donorName, donorEmail, frequency, programmeId, locale: "en", fapshiTransactionId: "TX" + amount, status, createdAt, updatedAt: createdAt, ...(failureReason ? { failureReason } : {}) });
+  db.donations["d2"] = don(25000, "Ada Ngu", "ada@example.test", "monthly", "wum-water", "completed", ago(30));
+  db.donations["d3"] = don(10000, "Tabi Collins", "tabi@example.test", "one-time", "girls-school", "completed", ago(100));
+  db.donations["d4"] = don(15000, "Mbah Grace", "grace@example.test", "one-time", null, "pending", ago(0.5));
+  db.donations["d5"] = don(7500, "Fon Peter", "peter@example.test", "one-time", "health-clinics", "pending", ago(72));
+  db.donations["d6"] = don(5000, "Neba Joy", "joy@example.test", "one-time", "womens-seed", "failed", ago(50), "fapshi_expired");
+  db.donations["d7"] = don(8000, "Ngwa Sam", "sam@example.test", "one-time", "wum-water", "failed", ago(20), "amount_mismatch_800");
   return db;
 }
 const save = (db: Db) => sessionStorage.setItem(KEY, JSON.stringify(db));

@@ -21,7 +21,7 @@ const inter = localFont({ src: "../fonts/inter-latin-wght-normal.woff2", variabl
 const mono = localFont({ src: "../fonts/jetbrains-mono-latin-500-normal.woff2", variable: "--font-mono-brand", display: "swap", weight: "500" });
 
 /** Console edits go live within this many seconds (ISR). In `next dev` pages are always fresh. */
-export const revalidate = 30;
+export const revalidate = 60;
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
