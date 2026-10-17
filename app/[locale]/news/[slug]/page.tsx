@@ -6,7 +6,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { AppLink } from "@/components/ui/AppLink";
 import { Media } from "@/components/ui/Media";
 import { routing } from "@/i18n/routing";
-import { getNews, getNewsBySlug } from "@/lib/data";
+import { getNews, getNewsBySlug, servedFallback } from "@/lib/data";
 import { formatDate, localize } from "@/lib/i18n";
 import { absoluteUrl, pageMetadata, siteUrl } from "@/lib/seo";
 import { siteName } from "@/theme/brand.config";
@@ -15,12 +15,14 @@ import { Container, Section } from "@/components/ui/Section";
 import { btnRow, headingXl, monoLabel, proseP, proseWrap } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 30;
+export const revalidate = 60;
+export const dynamicParams = true;
 
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
   const items = await getNews();
+  if (servedFallback()) return [];
   return routing.locales.flatMap((locale) => items.map((n) => ({ locale, slug: n.slug })));
 }
 

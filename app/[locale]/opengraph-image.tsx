@@ -4,7 +4,7 @@ import { getPage } from "@/lib/data";
 import { localize } from "@/lib/i18n";
 import { ogImage, ogSize } from "@/lib/og";
 
-export const revalidate = 30;
+export const revalidate = 60;
 
 export const size = ogSize;
 export const contentType = "image/png";

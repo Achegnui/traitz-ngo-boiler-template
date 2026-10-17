@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp, type FirebaseApp, type FirebaseOptions } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, type Firestore } from "firebase/firestore";
 
 /**
  * The only place Firebase is initialised. Config comes from NEXT_PUBLIC_FIREBASE_* (see .env.example),
@@ -27,8 +27,18 @@ export function getFirebaseApp(): FirebaseApp {
   return getApps().length ? getApp() : initializeApp(firebaseConfig());
 }
 
+let db: Firestore | undefined;
+
+/** Auto-detect long polling helps on restrictive networks. initializeFirestore must run once per app, so it is cached. */
 export function getDb(): Firestore {
-  return getFirestore(getFirebaseApp());
+  if (db) return db;
+  const app = getFirebaseApp();
+  try {
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+  } catch {
+    db = getFirestore(app); // already initialised (hot reload)
+  }
+  return db;
 }
 
 /** Browser-only (admin). Uses the same app as Firestore. */

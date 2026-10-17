@@ -10,7 +10,7 @@ import { localize } from "@/lib/i18n";
 import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import { siteName } from "@/theme/brand.config";
 
-export const revalidate = 30;
+export const revalidate = 60;
 
 type Props = { params: Promise<{ locale: string }> };
 

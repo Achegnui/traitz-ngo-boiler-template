@@ -1,9 +1,12 @@
+import path from "node:path";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const config: NextConfig = {
+  // Pin tracing to this project so a lockfile in a parent folder is not picked as the workspace root.
+  outputFileTracingRoot: path.resolve(__dirname),
   // Always defined, so Next inlines it as a constant and the unused admin backend (the in-memory test one by
   // default) is removed from the bundle instead of shipping.
   env: {

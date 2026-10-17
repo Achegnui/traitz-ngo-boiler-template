@@ -10,7 +10,7 @@ import { Media } from "@/components/ui/Media";
 import { ProgrammeCard } from "@/components/ui/ProgrammeCard";
 import { SectionHead } from "@/components/ui/SectionHead";
 import { routing } from "@/i18n/routing";
-import { getAllProgrammes, getProgrammeBySlug } from "@/lib/data";
+import { getAllProgrammes, getProgrammeBySlug, servedFallback } from "@/lib/data";
 import { xaf } from "@/lib/format";
 import { localize } from "@/lib/i18n";
 import { pageMetadata } from "@/lib/seo";
@@ -22,11 +22,13 @@ import { cardGrid, figCaption, figClass, figMedia, monoLabel, moreLink, proseP, 
 import { cn } from "@/lib/utils";
 
 /** Console edits go live within this many seconds (ISR). In `next dev` pages are always fresh. */
-export const revalidate = 30;
+export const revalidate = 60;
+export const dynamicParams = true;
 type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateStaticParams() {
   const all = await getAllProgrammes();
+  if (servedFallback()) return [];
   return routing.locales.flatMap((locale) => all.map((p) => ({ locale, slug: p.slug })));
 }
 
